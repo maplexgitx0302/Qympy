@@ -1,5 +1,5 @@
 import sympy as sp
-from functions import *
+from foundation.functions import *
 
 class QubitGate:
     def __init__(self):
@@ -75,7 +75,7 @@ class Z(SingleQubitGate):
 class RX(SingleQubitGate):
     def __init__(self, symbol_name, wire):
         super().__init__()
-        self.symbol = sp.Symbol(symbol_name)
+        self.symbol = sp.Symbol(symbol_name, real=True)
         self.wire = wire
         theta = self.symbol
         half  = sp.Rational(1, 2)
@@ -87,7 +87,7 @@ class RX(SingleQubitGate):
 class RY(SingleQubitGate):
     def __init__(self, symbol_name, wire):
         super().__init__()
-        self.symbol = sp.Symbol(symbol_name)
+        self.symbol = sp.Symbol(symbol_name, real=True)
         self.wire = wire
         theta = self.symbol
         half  = sp.Rational(1, 2)
@@ -99,7 +99,7 @@ class RY(SingleQubitGate):
 class RZ(SingleQubitGate):
     def __init__(self, symbol_name, wire):
         super().__init__()
-        self.symbol = sp.Symbol(symbol_name)
+        self.symbol = sp.Symbol(symbol_name, real=True)
         self.wire = wire
         theta = self.symbol
         half  = sp.Rational(1, 2)

@@ -1,7 +1,7 @@
 import sympy as sp
 import qiskit
-import gate
-from functions import *
+import foundation.gate as gate
+from foundation.functions import *
 
 class Circuit:
     def __init__(self, num_qubits):
@@ -10,6 +10,7 @@ class Circuit:
         self.initial_state  = sp.Matrix([1]+[0]*(2**num_qubits-1))
         self.final_state    = None
         self.gate_list      = []
+        self.symbol_list    = []
     def evolve_state(self):
         self.final_state = self.initial_state
         gate_flag, gate_buffer = False, [identity(2) for _ in range(self.num_qubits)]
@@ -31,6 +32,16 @@ class Circuit:
                 self.final_state = full_matrix * self.final_state
             else:
                 raise TypeError("Unknown gate type : {self.gate_list[i].gate_type}")
+    def measure(self, qubit, basis):
+        assert self.final_state != None, "Circuit should be evolved before measurement: try Circuit.evolve_state()"
+        assert basis in ["X", "Y", "Z"], "Basis should be X or Y or Z"
+        basis_dict = {
+            "X": sp.Matrix([[0,1],[1,0],]),
+            "Y": sp.Matrix([[0,-sp.I],[sp.I,0],]),
+            "Z": sp.Matrix([[1,0],[0,-1],]),
+        }
+        full_matrix = kron(identity(2**qubit), basis_dict[basis], identity(2**(self.num_qubits-qubit-1)))
+        return adjoint(self.final_state) * full_matrix * self.final_state
     def _check_wire(self, wire):
         num_qubits = self.num_qubits
         if wire >= num_qubits:
@@ -55,14 +66,20 @@ class Circuit:
         self._check_wire(wire)
         self.qiskit_circuit.rx(qiskit.circuit.Parameter(symbol_name), wire)
         self.gate_list.append(gate.RX(symbol_name, wire))
+        if symbol_name not in self.symbol_list:
+            self.symbol_list.append(symbol_name)
     def ry(self, symbol_name, wire):
         self._check_wire(wire)
         self.qiskit_circuit.ry(qiskit.circuit.Parameter(symbol_name), wire)
         self.gate_list.append(gate.RY(symbol_name, wire))
+        if symbol_name not in self.symbol_list:
+            self.symbol_list.append(symbol_name)
     def rz(self, symbol_name, wire):
         self._check_wire(wire)
         self.qiskit_circuit.rz(qiskit.circuit.Parameter(symbol_name), wire)
         self.gate_list.append(gate.RZ(symbol_name, wire))
+        if symbol_name not in self.symbol_list:
+            self.symbol_list.append(symbol_name)
     def swap(self, wire1, wire2):
         self._check_wire(wire1)
         self._check_wire(wire2)

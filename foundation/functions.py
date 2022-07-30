@@ -1,5 +1,6 @@
 import sympy as sp
 from sympy.physics.quantum import TensorProduct
+from sympy.physics.quantum.dagger import Dagger
 
 def kron(*matrices):
     output = sp.eye(1)
@@ -12,3 +13,6 @@ def identity(dim):
         return sp.eye(1)
     else:
         return sp.eye(dim)
+
+def adjoint(matrix):
+    return Dagger(matrix)
