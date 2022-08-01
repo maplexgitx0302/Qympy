@@ -86,6 +86,24 @@ class Circuit:
         self.qiskit_circuit.rz(qiskit.circuit.Parameter(symbol_name), wire)
         self.gate_list.append(gate.RZ(symbol_name, wire))
         self.symbol_set.add(symbol_name)
+    def rxx(self, symbol_name, wire1, wire2):
+        self._check_wire(wire1)
+        self._check_wire(wire2)
+        self.qiskit_circuit.rxx(qiskit.circuit.Parameter(symbol_name), wire1, wire2)
+        self.gate_list.append(gate.RXX(symbol_name, wire1, wire2))
+        self.symbol_set.add(symbol_name)
+    def ryy(self, symbol_name, wire1, wire2):
+        self._check_wire(wire1)
+        self._check_wire(wire2)
+        self.qiskit_circuit.ryy(qiskit.circuit.Parameter(symbol_name), wire1, wire2)
+        self.gate_list.append(gate.RYY(symbol_name, wire1, wire2))
+        self.symbol_set.add(symbol_name)
+    def rzz(self, symbol_name, wire1, wire2):
+        self._check_wire(wire1)
+        self._check_wire(wire2)
+        self.qiskit_circuit.rzz(qiskit.circuit.Parameter(symbol_name), wire1, wire2)
+        self.gate_list.append(gate.RZZ(symbol_name, wire1, wire2))
+        self.symbol_set.add(symbol_name)
     def swap(self, wire1, wire2):
         self._check_wire(wire1)
         self._check_wire(wire2)

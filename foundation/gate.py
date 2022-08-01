@@ -108,6 +108,54 @@ class RZ(SingleQubitGate):
             [0, sp.exp(sp.I*half*theta)], 
         ])
 
+class RXX(TwoQubitGate):
+    def __init__(self, symbol_name, wire1, wire2):
+        super().__init__()
+        self.symbol = sp.Symbol(symbol_name, real=True)
+        self.wire1 = wire1
+        self.wire2 = wire2
+        theta = self.symbol
+        half  = sp.Rational(1, 2)
+        self.matrix = sp.Matrix([
+            [sp.cos(half*theta),0,0,-sp.I*sp.sin(half*theta)],
+            [0,sp.cos(half*theta),-sp.I*sp.sin(half*theta),0],
+            [0,-sp.I*sp.sin(half*theta),sp.cos(half*theta),0],
+            [-sp.I*sp.sin(half*theta),0,0,sp.cos(half*theta)],
+        ])
+        self.submatrix = self.get_submatrix(wire1, wire2)
+
+class RYY(TwoQubitGate):
+    def __init__(self, symbol_name, wire1, wire2):
+        super().__init__()
+        self.symbol = sp.Symbol(symbol_name, real=True)
+        self.wire1 = wire1
+        self.wire2 = wire2
+        theta = self.symbol
+        half  = sp.Rational(1, 2)
+        self.matrix = sp.Matrix([
+            [sp.cos(half*theta),0,0,sp.I*sp.sin(half*theta)],
+            [0,sp.cos(half*theta),-sp.I*sp.sin(half*theta),0],
+            [0,-sp.I*sp.sin(half*theta),sp.cos(half*theta),0],
+            [sp.I*sp.sin(half*theta),0,0,sp.cos(half*theta)],
+        ])
+        self.submatrix = self.get_submatrix(wire1, wire2)
+
+class RZZ(TwoQubitGate):
+    def __init__(self, symbol_name, wire1, wire2):
+        super().__init__()
+        self.symbol = sp.Symbol(symbol_name, real=True)
+        self.wire1 = wire1
+        self.wire2 = wire2
+        theta = self.symbol
+        half  = sp.Rational(1, 2)
+        self.matrix = sp.Matrix([
+            [sp.exp(-sp.I*half*theta),0,0,0],
+            [0,sp.exp(sp.I*half*theta),0,0],
+            [0,0,sp.exp(sp.I*half*theta),0],
+            [0,0,0,sp.exp(-sp.I*half*theta)],
+        ])
+        self.submatrix = self.get_submatrix(wire1, wire2)
+
 class SWAP(TwoQubitGate):
     def __init__(self, wire1, wire2):
         super().__init__()
