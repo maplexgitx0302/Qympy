@@ -11,6 +11,9 @@ class Circuit:
         self.final_state    = None
         self.gate_list      = []
         self.symbol_set    = set()
+        # for quantum machine learning
+        self.meas_mode  = None
+        self.meas_basis = None
     def evolve_state(self):
         self.final_state = self.initial_state
         gate_flag, gate_buffer = False, [identity(2) for _ in range(self.num_qubits)]
@@ -34,7 +37,7 @@ class Circuit:
                 raise TypeError("Unknown gate type : {self.gate_list[i].gate_type}")
     def measure(self, qubit, basis):
         assert self.final_state != None, "Circuit should be evolved before measurement: try Circuit.evolve_state()"
-        assert basis in ["X", "Y", "Z"], "Basis should be X or Y or Z"
+        assert basis in ["X", "Y", "Z"], f"Basis should be X or Y or Z, not {basis}"
         basis_dict = {
             "X": sp.Matrix([[0,1],[1,0],]),
             "Y": sp.Matrix([[0,-sp.I],[sp.I,0],]),
@@ -54,7 +57,25 @@ class Circuit:
         new_circuit.qiskit_circuit = self.qiskit_circuit.compose(other.qiskit_circuit)
         new_circuit.gate_list      = self.gate_list + other.gate_list
         new_circuit.symbol_set     = self.symbol_set.union(other.symbol_set)
+        if self.meas_mode != None: new_circuit.meas_mode = self.meas_mode
+        elif other.meas_mode != None: new_circuit.meas_mode = other.meas_mode
+        if self.meas_basis != None: new_circuit.meas_basis = self.meas_basis
+        elif other.meas_basis != None: new_circuit.meas_basis = other.meas_basis
         return new_circuit
+    def __call__(self, x):
+        subs = {}
+        for i in range(len(x)):
+            subs[sp.Symbol(f"inputs_{i}", real=True)] = x[i]
+        self.evolve_state()
+        self.final_state = self.final_state.evalf(subs=subs)
+        meas_value = []
+        if self.meas_mode == "measure_all":
+            for basis in self.meas_basis:
+                meas_value += [self.measure(q, basis) for q in range(self.num_qubits)]
+        elif self.meas_mode == "measure_single":
+            for basis in self.meas_basis:
+                meas_value += [self.measure(0, basis)]
+        return sp.Matrix(meas_value)
     def h(self, wire):
         self._check_wire(wire)
         self.qiskit_circuit.h(wire)
