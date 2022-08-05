@@ -1,9 +1,9 @@
 import sympy as sp
 from circuit.circuit import Circuit
 
-
 class SingleRot(Circuit):
-    def __init__(self, num_qubits, num_layers, prefix="theta", rot_mode=['rz', 'ry', 'rz'], ent_mode='cx'):
+    def __init__(self, num_qubits, num_layers, prefix="theta", 
+                 rot_mode=['rz', 'ry', 'rz'], ent_mode='cx'):
         super().__init__(num_qubits)
         for l in range(num_layers):
             for q in range(num_qubits):

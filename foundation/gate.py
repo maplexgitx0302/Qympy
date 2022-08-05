@@ -73,11 +73,9 @@ class Z(SingleQubitGate):
         ])
 
 class RX(SingleQubitGate):
-    def __init__(self, symbol_name, wire):
+    def __init__(self, theta, wire):
         super().__init__()
-        self.symbol = sp.Symbol(symbol_name, real=True)
         self.wire = wire
-        theta = self.symbol
         half  = sp.Rational(1, 2)
         self.matrix = sp.Matrix([
             [sp.cos(half*theta), -sp.I*sp.sin(half*theta)], 
@@ -85,11 +83,9 @@ class RX(SingleQubitGate):
         ])
 
 class RY(SingleQubitGate):
-    def __init__(self, symbol_name, wire):
+    def __init__(self, theta, wire):
         super().__init__()
-        self.symbol = sp.Symbol(symbol_name, real=True)
         self.wire = wire
-        theta = self.symbol
         half  = sp.Rational(1, 2)
         self.matrix = sp.Matrix([
             [sp.cos(half*theta), -sp.sin(half*theta)], 
@@ -97,11 +93,9 @@ class RY(SingleQubitGate):
         ])
 
 class RZ(SingleQubitGate):
-    def __init__(self, symbol_name, wire):
+    def __init__(self, theta, wire):
         super().__init__()
-        self.symbol = sp.Symbol(symbol_name, real=True)
         self.wire = wire
-        theta = self.symbol
         half  = sp.Rational(1, 2)
         self.matrix = sp.Matrix([
             [sp.exp(-sp.I*half*theta), 0], 
@@ -109,12 +103,10 @@ class RZ(SingleQubitGate):
         ])
 
 class RXX(TwoQubitGate):
-    def __init__(self, symbol_name, wire1, wire2):
+    def __init__(self, theta, wire1, wire2):
         super().__init__()
-        self.symbol = sp.Symbol(symbol_name, real=True)
         self.wire1 = wire1
         self.wire2 = wire2
-        theta = self.symbol
         half  = sp.Rational(1, 2)
         self.matrix = sp.Matrix([
             [sp.cos(half*theta),0,0,-sp.I*sp.sin(half*theta)],
@@ -125,12 +117,10 @@ class RXX(TwoQubitGate):
         self.submatrix = self.get_submatrix(wire1, wire2)
 
 class RYY(TwoQubitGate):
-    def __init__(self, symbol_name, wire1, wire2):
+    def __init__(self, theta, wire1, wire2):
         super().__init__()
-        self.symbol = sp.Symbol(symbol_name, real=True)
         self.wire1 = wire1
         self.wire2 = wire2
-        theta = self.symbol
         half  = sp.Rational(1, 2)
         self.matrix = sp.Matrix([
             [sp.cos(half*theta),0,0,sp.I*sp.sin(half*theta)],
@@ -141,12 +131,10 @@ class RYY(TwoQubitGate):
         self.submatrix = self.get_submatrix(wire1, wire2)
 
 class RZZ(TwoQubitGate):
-    def __init__(self, symbol_name, wire1, wire2):
+    def __init__(self, theta, wire1, wire2):
         super().__init__()
-        self.symbol = sp.Symbol(symbol_name, real=True)
         self.wire1 = wire1
         self.wire2 = wire2
-        theta = self.symbol
         half  = sp.Rational(1, 2)
         self.matrix = sp.Matrix([
             [sp.exp(-sp.I*half*theta),0,0,0],

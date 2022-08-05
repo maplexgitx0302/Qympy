@@ -71,39 +71,57 @@ class Circuit:
         self._check_wire(wire)
         self.qiskit_circuit.z(wire)
         self.gate_list.append(gate.Z(wire))
-    def rx(self, symbol_name, wire):
+    def rx(self, theta, wire):
         self._check_wire(wire)
-        self.qiskit_circuit.rx(qiskit.circuit.Parameter(symbol_name), wire)
-        self.gate_list.append(gate.RX(symbol_name, wire))
-        self.symbol_set.add(symbol_name)
-    def ry(self, symbol_name, wire):
+        if type(theta) == sp.Symbol:
+            self.qiskit_circuit.rx(qiskit.circuit.Parameter(theta.name), wire)
+            self.symbol_set.add(theta)
+        else:
+            self.qiskit_circuit.rx(theta, wire)
+        self.gate_list.append(gate.RX(theta, wire))
+    def ry(self, theta, wire):
         self._check_wire(wire)
-        self.qiskit_circuit.ry(qiskit.circuit.Parameter(symbol_name), wire)
-        self.gate_list.append(gate.RY(symbol_name, wire))
-        self.symbol_set.add(symbol_name)
-    def rz(self, symbol_name, wire):
+        if type(theta) == sp.Symbol:
+            self.qiskit_circuit.ry(qiskit.circuit.Parameter(theta.name), wire)
+            self.symbol_set.add(theta)
+        else:
+            self.qiskit_circuit.ry(theta, wire)
+        self.gate_list.append(gate.RY(theta, wire))
+    def rz(self, theta, wire):
         self._check_wire(wire)
-        self.qiskit_circuit.rz(qiskit.circuit.Parameter(symbol_name), wire)
-        self.gate_list.append(gate.RZ(symbol_name, wire))
-        self.symbol_set.add(symbol_name)
-    def rxx(self, symbol_name, wire1, wire2):
+        if type(theta) == sp.Symbol:
+            self.qiskit_circuit.rz(qiskit.circuit.Parameter(theta.name), wire)
+            self.symbol_set.add(theta)
+        else:
+            self.qiskit_circuit.rz(theta, wire)
+        self.gate_list.append(gate.RZ(theta, wire))
+    def rxx(self, theta, wire1, wire2):
         self._check_wire(wire1)
         self._check_wire(wire2)
-        self.qiskit_circuit.rxx(qiskit.circuit.Parameter(symbol_name), wire1, wire2)
-        self.gate_list.append(gate.RXX(symbol_name, wire1, wire2))
-        self.symbol_set.add(symbol_name)
-    def ryy(self, symbol_name, wire1, wire2):
+        if type(theta) == sp.Symbol:
+            self.qiskit_circuit.rxx(qiskit.circuit.Parameter(theta.name), wire1, wire2)
+            self.symbol_set.add(theta)
+        else:
+            self.qiskit_circuit.rxx(theta, wire1, wire2)
+        self.gate_list.append(gate.RXX(theta, wire1, wire2))
+    def ryy(self, theta, wire1, wire2):
         self._check_wire(wire1)
         self._check_wire(wire2)
-        self.qiskit_circuit.ryy(qiskit.circuit.Parameter(symbol_name), wire1, wire2)
-        self.gate_list.append(gate.RYY(symbol_name, wire1, wire2))
-        self.symbol_set.add(symbol_name)
-    def rzz(self, symbol_name, wire1, wire2):
+        if type(theta) == sp.Symbol:
+            self.qiskit_circuit.ryy(qiskit.circuit.Parameter(theta.name), wire1, wire2)
+            self.symbol_set.add(theta)
+        else:
+            self.qiskit_circuit.ryy(theta, wire1, wire2)
+        self.gate_list.append(gate.RYY(theta, wire1, wire2))
+    def rzz(self, theta, wire1, wire2):
         self._check_wire(wire1)
         self._check_wire(wire2)
-        self.qiskit_circuit.rzz(qiskit.circuit.Parameter(symbol_name), wire1, wire2)
-        self.gate_list.append(gate.RZZ(symbol_name, wire1, wire2))
-        self.symbol_set.add(symbol_name)
+        if type(theta) == sp.Symbol:
+            self.qiskit_circuit.rzz(qiskit.circuit.Parameter(theta.name), wire1, wire2)
+            self.symbol_set.add(theta)
+        else:
+            self.qiskit_circuit.rzz(theta, wire1, wire2)
+        self.gate_list.append(gate.RZZ(theta, wire1, wire2))
     def swap(self, wire1, wire2):
         self._check_wire(wire1)
         self._check_wire(wire2)
