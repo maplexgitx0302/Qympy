@@ -1,7 +1,7 @@
 import sympy as sp
 import qiskit
-from . import sp_gate
-from . import sp_func
+from qympy.quantum_circuit import sp_gate
+from qympy.quantum_circuit import sp_func
 
 class Circuit:
     def __init__(self, num_qubits):
