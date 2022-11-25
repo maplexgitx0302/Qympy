@@ -6,7 +6,7 @@ long_description = (this_directory / "README.md").read_text()
 
 setup(
     name='qympy',
-    version='1.0.1',
+    version='1.0.2',
     license='MIT',
     author="Yi-An Chen",
     author_email='r08222011@gmail.com',

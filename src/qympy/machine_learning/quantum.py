@@ -1,5 +1,5 @@
 import sympy as sp
-from ..circuit.sp_circuit import Circuit
+from quantum_circuit.sp_circuit import Circuit
 
 class Measurement(Circuit):
     def __init__(self, num_qubits, meas_mode, meas_basis):
@@ -15,7 +15,7 @@ class AngleEncoding(Circuit):
 
 class SingleRot(Circuit):
     def __init__(self, num_qubits, num_layers=1, prefix="T", 
-                 rot_mode=['rz', 'ry', 'rz'], ent_mode='cx'):
+                rot_mode=['rz', 'ry', 'rz'], ent_mode='cx'):
         super().__init__(num_qubits)
         for l in range(num_layers):
             for q in range(num_qubits):

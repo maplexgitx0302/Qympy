@@ -7,7 +7,7 @@ See GitHub: https://github.com/r08222011/Qympy
 ### Get Started
 
 **1. Circuit Initialization**
-Common circuits ansatz can be found in `/src/circuit/sp_circuit`. To build a circuit from beginning, use `sp_circuit.Circuit`. The basic use of `Circuit` is same as [Qiskit](https://qiskit.org). For example:
+Common circuits ansatz can be found in `/src/qympy/quantum_circuit`. To build a circuit from beginning, use `sp_circuit.Circuit`. The basic use of `Circuit` is same as [Qiskit](https://qiskit.org). For example:
 ```python3
 >>> from sp_circuit import Circuit
 
@@ -22,7 +22,7 @@ We now have initialized a quantum circuit. To see the circuit we built, we can u
 ```python3
 >>> qc.draw("mpl")
 ```
-![plot](./example/example_readme.png)
+![plot](./src/qympy/example/example_readme.png)
 
 1. Evolve and measure the circuit
 The last step for getting the analytic expression is to call the method `Circuit.evolve_state()`. This will calculate the final state with the gates applied. After evolving the quantum state, we can measure the quantum state with *X*, *Y*, *Z* basis with a single certain qubit. For example:

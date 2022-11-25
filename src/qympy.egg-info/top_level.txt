@@ -1,2 +1,1 @@
-circuit
-machinelearning
+qympy

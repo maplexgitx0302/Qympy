@@ -1,5 +1,5 @@
 import sympy as sp
-from . import sp_func
+import quantum_circuit.sp_func as sp_func
 
 class QubitGate:
     def __init__(self):
