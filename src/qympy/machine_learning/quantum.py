@@ -1,5 +1,5 @@
 import sympy as sp
-from quantum_circuit.sp_circuit import Circuit
+from qympy.quantum_circuit.sp_circuit import Circuit
 
 class Measurement(Circuit):
     def __init__(self, num_qubits, meas_mode, meas_basis):
