@@ -1,5 +1,5 @@
 import sympy as sp
-from circuit.circuit import Circuit
+from ..circuit.sp_circuit import Circuit
 
 class Measurement(Circuit):
     def __init__(self, num_qubits, meas_mode, meas_basis):

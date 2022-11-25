@@ -1,0 +1,14 @@
+README.md
+setup.py
+src/circuit/__init__.py
+src/circuit/sp_circuit.py
+src/circuit/sp_func.py
+src/circuit/sp_gate.py
+src/machinelearning/__init__.py
+src/machinelearning/classical.py
+src/machinelearning/quantum.py
+src/qympy.egg-info/PKG-INFO
+src/qympy.egg-info/SOURCES.txt
+src/qympy.egg-info/dependency_links.txt
+src/qympy.egg-info/requires.txt
+src/qympy.egg-info/top_level.txt

@@ -1,5 +1,5 @@
 import sympy as sp
-from foundation.functions import *
+from . import sp_func
 
 class QubitGate:
     def __init__(self):
@@ -30,11 +30,11 @@ class TwoQubitGate(QubitGate):
             elif wire_min == wire2:
                 return self._SWAP * self.matrix * self._SWAP
         else:
-            swap_gate = kron(identity(2**((wire_max-wire_min)-1)), self._SWAP)
+            swap_gate = sp_func.kron(sp_func.identity(2**((wire_max-wire_min)-1)), self._SWAP)
             if wire_min == wire1:
-                return swap_gate * kron(self.get_submatrix(wire_min, wire_max-1), identity(2)) * swap_gate
+                return swap_gate * sp_func.kron(self.get_submatrix(wire_min, wire_max-1), sp_func.identity(2)) * swap_gate
             elif wire_min == wire2:
-                return swap_gate * kron(self.get_submatrix(wire_max-1, wire_min), identity(2)) * swap_gate
+                return swap_gate * sp_func.kron(self.get_submatrix(wire_max-1, wire_min), sp_func.identity(2)) * swap_gate
 
 class H(SingleQubitGate):
     def __init__(self, wire):
