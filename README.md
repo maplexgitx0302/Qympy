@@ -1,5 +1,6 @@
 # Qympy - Quantum Analytic Computation with Sympy
 A sympy based python package for symbolic calculation of $n$-qubit quantum state.
+See GitHub: https://github.com/r08222011/Qympy
 
 ---
 
