@@ -1,5 +1,5 @@
 import sympy as sp
-from qympy.quantum_circuit import sp_func
+from sympy.physics.quantum import TensorProduct
 
 class QubitGate:
     def __init__(self):
@@ -30,11 +30,11 @@ class TwoQubitGate(QubitGate):
             elif wire_min == wire2:
                 return self._SWAP * self.matrix * self._SWAP
         else:
-            swap_gate = sp_func.kron(sp_func.identity(2**((wire_max-wire_min)-1)), self._SWAP)
+            swap_gate = TensorProduct(sp.eye(2**((wire_max-wire_min)-1)), self._SWAP)
             if wire_min == wire1:
-                return swap_gate * sp_func.kron(self.get_submatrix(wire_min, wire_max-1), sp_func.identity(2)) * swap_gate
+                return swap_gate * TensorProduct(self.get_submatrix(wire_min, wire_max-1), sp.eye(2)) * swap_gate
             elif wire_min == wire2:
-                return swap_gate * sp_func.kron(self.get_submatrix(wire_max-1, wire_min), sp_func.identity(2)) * swap_gate
+                return swap_gate * TensorProduct(self.get_submatrix(wire_max-1, wire_min), sp.eye(2)) * swap_gate
 
 class H(SingleQubitGate):
     def __init__(self, wire):
@@ -114,7 +114,6 @@ class RXX(TwoQubitGate):
             [0,-sp.I*sp.sin(half*theta),sp.cos(half*theta),0],
             [-sp.I*sp.sin(half*theta),0,0,sp.cos(half*theta)],
         ])
-        self.submatrix = self.get_submatrix(wire1, wire2)
 
 class RYY(TwoQubitGate):
     def __init__(self, theta, wire1, wire2):
@@ -128,7 +127,6 @@ class RYY(TwoQubitGate):
             [0,-sp.I*sp.sin(half*theta),sp.cos(half*theta),0],
             [sp.I*sp.sin(half*theta),0,0,sp.cos(half*theta)],
         ])
-        self.submatrix = self.get_submatrix(wire1, wire2)
 
 class RZZ(TwoQubitGate):
     def __init__(self, theta, wire1, wire2):
@@ -142,7 +140,6 @@ class RZZ(TwoQubitGate):
             [0,0,sp.exp(sp.I*half*theta),0],
             [0,0,0,sp.exp(-sp.I*half*theta)],
         ])
-        self.submatrix = self.get_submatrix(wire1, wire2)
 
 class SWAP(TwoQubitGate):
     def __init__(self, wire1, wire2):
@@ -155,7 +152,6 @@ class SWAP(TwoQubitGate):
             [0,1,0,0],
             [0,0,0,1],
         ])
-        self.submatrix = self.get_submatrix(wire1, wire2)
 
 class CX(TwoQubitGate):
     def __init__(self, wire1, wire2):
@@ -168,7 +164,6 @@ class CX(TwoQubitGate):
             [0,0,0,1],
             [0,0,1,0],
         ])
-        self.submatrix = self.get_submatrix(wire1, wire2)
 
 class CZ(TwoQubitGate):
     def __init__(self, wire1, wire2):
@@ -181,4 +176,3 @@ class CZ(TwoQubitGate):
             [0,0,1,0],
             [0,0,0,-1],
         ])
-        self.submatrix = self.get_submatrix(wire1, wire2)
