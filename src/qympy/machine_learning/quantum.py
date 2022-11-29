@@ -26,5 +26,4 @@ class Measurement():
         self.qubits = qubits
         self.bases  = bases
     def __call__(self, circuit):
-        circuit.evolve()
         return sp.Matrix([circuit.measure(q, b) for q, b in product(self.qubits, self.bases)])

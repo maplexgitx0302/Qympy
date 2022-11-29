@@ -79,7 +79,7 @@ class Circuit:
         subs = {}
         for i in range(len(x)):
             subs[sp.Symbol(f"inputs_{i}", real=True)] = x[i]
-        self.final_state.evalf(subs=subs)
+        self.final_state = self.final_state.evalf(subs=subs)
         return self
     def _check_wire(self, wire):
         '''Check whether the wire of a gate applied is valid'''
