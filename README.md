@@ -73,9 +73,6 @@ In this section, we demonstrate how to use symbolic expression to calculate mach
 We construct a hybrid model with a `Linear` layer followed by a quantum circuit, which is constructed with `AngleEncoding` and `SingleRot`, and finally end up with a `Measurement`.
 
 ```python
-import os, sys
-sys.path.append("../../")
-
 import sympy as sp
 from qympy.quantum_circuit.sp_circuit import Circuit
 from qympy.machine_learning.classical import Linear
