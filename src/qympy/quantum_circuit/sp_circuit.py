@@ -5,39 +5,52 @@ from sympy.physics.quantum.dagger import Dagger
 from qympy.quantum_circuit import sp_gate
 
 class Circuit:
+
     def __init__(self, num_qubits):
+        '''Symbolic quantum circuit with Sympy'''
+        # initialization
         self.num_qubits     = num_qubits
-        self.qiskit_circuit = qiskit.circuit.QuantumCircuit(num_qubits)
         self.initial_state  = sp.Matrix([1]+[0]*(2**num_qubits-1))
         self.final_state    = None
-        self.gate_list      = []
-        self.theta_set      = set()
+        # gates record
+        self.gate_record    = []    # record of sequence of applied gates
+        self.theta_set      = set() # set of strings of parameters 'theta'
+        # qiskit plotting
+        self.qiskit_circuit = qiskit.circuit.QuantumCircuit(num_qubits)
         self.qiskit_params  = {}
+
     def evolve(self):
+        '''Evolve the circuit to compute the final quantum state (final_state)'''
+        # initialize the quantum state
         self.final_state = self.initial_state
-        gate_flag, gate_buffer = False, [sp.eye(2) for _ in range(self.num_qubits)]
-        for i in range(len(self.gate_list)):
-            if self.gate_list[i].gate_type == "SingleQubitGate":
-                gate_flag = True
-                wire = self.gate_list[i].wire
-                gate_buffer[wire] = self.gate_list[i].matrix * gate_buffer[wire]
-                if i == len(self.gate_list)-1:
-                    self.final_state = TensorProduct(*gate_buffer) * self.final_state
-            elif self.gate_list[i].gate_type == "TwoQubitGate":
-                if gate_flag == True:
-                    self.final_state = TensorProduct(*gate_buffer) * self.final_state
-                    gate_flag, gate_buffer = False, [sp.eye(2) for _ in range(self.num_qubits)]
-                wire1, wire2 = self.gate_list[i].wire1, self.gate_list[i].wire2
-                submatrix = self.gate_list[i].get_submatrix(wire1, wire2)
-                wire_min, wire_max = min(wire1, wire2), max(wire1, wire2)
+        # start computing matrices product (sequence of applied gates)
+        gate_buffer = [sp.eye(2) for _ in range(self.num_qubits)]
+        for i in range(len(self.gate_record)):
+            if self.gate_record[i].gate_type == "SingleQubitGate":
+                # postpone the tensor product of single-qubit gates until two-qubit gates appear
+                wire = self.gate_record[i].wire
+                gate_buffer[wire] = self.gate_record[i].matrix * gate_buffer[wire]
+            elif self.gate_record[i].gate_type == "TwoQubitGate":
+                # apply gate_buffer gates first then apply two-qubit gates
+                wire1 = self.gate_record[i].wire1
+                wire2 = self.gate_record[i].wire2
+                submatrix = self.gate_record[i].get_submatrix(wire1, wire2)
+                wire_min = min(wire1, wire2)
+                wire_max = max(wire1, wire2)
                 full_matrix = TensorProduct(sp.eye(2**wire_min), submatrix, sp.eye(2**(self.num_qubits-wire_max-1)))
+                self.final_state = TensorProduct(*gate_buffer) * self.final_state
                 self.final_state = full_matrix * self.final_state
+                gate_buffer = [sp.eye(2) for _ in range(self.num_qubits)]
             else:
-                raise TypeError("Unknown gate type : {self.gate_list[i].gate_type}")
+                raise TypeError("Unknown gate type : {self.gate_record[i].gate_type}")
+        self.final_state = TensorProduct(*gate_buffer) * self.final_state
+
     def measure(self, qubit, basis):
+        '''Single qubit measurement only'''
+        # check basis and evolution of final_state
         assert basis in ["X", "Y", "Z"], f"Basis should be X or Y or Z, not {basis}"
-        if self.final_state == None:
-            self.evolve()
+        if self.final_state == None: self.evolve()
+        # start measurement
         basis_dict = {
             "X": sp.Matrix([[0,1],[1,0],]),
             "Y": sp.Matrix([[0,-sp.I],[sp.I,0],]),
@@ -45,44 +58,50 @@ class Circuit:
         }
         full_matrix = TensorProduct(sp.eye(2**qubit), basis_dict[basis], sp.eye(2**(self.num_qubits-qubit-1)))
         return (Dagger(self.final_state) * full_matrix * self.final_state)[0]
+
     def draw(self, *args, **kwargs):
+        '''Draw quantum circuit with Qiskit'''
         return self.qiskit_circuit.draw(*args, **kwargs)
-    def _check_wire(self, wire):
-        num_qubits = self.num_qubits
-        if wire >= num_qubits:
-            raise ValueError(f"Wire {wire} is not between 0 to {num_qubits-1} with only {num_qubits} qubit(s).")
+
     def __add__(self, other):
+        '''Concatenate two quantum circuits, note that this method is not commutative'''
         new_circuit = Circuit(max(self.num_qubits, other.num_qubits))
         new_circuit.qiskit_circuit = self.qiskit_circuit.compose(other.qiskit_circuit)
-        new_circuit.gate_list      = self.gate_list + other.gate_list
+        new_circuit.gate_record    = self.gate_record + other.gate_record
         new_circuit.theta_set      = self.theta_set.union(other.theta_set)
+        # qiskit Parameters will show error if a Parameter has already created
         new_circuit.qiskit_params.update(self.qiskit_params)
         new_circuit.qiskit_params.update(other.qiskit_params)
         return new_circuit
     def __call__(self, x):
-        if self.final_state == None:
-            self.evolve()
+        '''Substitute inputs variables with x'''
+        if self.final_state == None: self.evolve()
         subs = {}
         for i in range(len(x)):
             subs[sp.Symbol(f"inputs_{i}", real=True)] = x[i]
         self.final_state.evalf(subs=subs)
         return self
+    def _check_wire(self, wire):
+        '''Check whether the wire of a gate applied is valid'''
+        num_qubits = self.num_qubits
+        if wire >= num_qubits:
+            raise ValueError(f"Wire {wire} is not between 0 to {num_qubits-1} with only {num_qubits} qubit(s).")
     def h(self, wire):
         self._check_wire(wire)
         self.qiskit_circuit.h(wire)
-        self.gate_list.append(sp_gate.H(wire))
+        self.gate_record.append(sp_gate.H(wire))
     def x(self, wire):
         self._check_wire(wire)
         self.qiskit_circuit.x(wire)
-        self.gate_list.append(sp_gate.X(wire))
+        self.gate_record.append(sp_gate.X(wire))
     def y(self, wire):
         self._check_wire(wire)
         self.qiskit_circuit.y(wire)
-        self.gate_list.append(sp_gate.Y(wire))
+        self.gate_record.append(sp_gate.Y(wire))
     def z(self, wire):
         self._check_wire(wire)
         self.qiskit_circuit.z(wire)
-        self.gate_list.append(sp_gate.Z(wire))
+        self.gate_record.append(sp_gate.Z(wire))
     def rx(self, theta, wire):
         self._check_wire(wire)
         if type(theta) == str:
@@ -93,10 +112,10 @@ class Circuit:
                 self.qiskit_circuit.rx(qiskit_param, wire)
                 self.theta_set.add(theta)
                 self.qiskit_params[theta] = qiskit_param
-            self.gate_list.append(sp_gate.RX(sp.Symbol(theta, real=True), wire))
+            self.gate_record.append(sp_gate.RX(sp.Symbol(theta, real=True), wire))
         else:
             self.qiskit_circuit.rx(theta, wire)
-            self.gate_list.append(sp_gate.RX(theta, wire))
+            self.gate_record.append(sp_gate.RX(theta, wire))
     def ry(self, theta, wire):
         self._check_wire(wire)
         if type(theta) == str:
@@ -107,10 +126,10 @@ class Circuit:
                 self.qiskit_circuit.ry(qiskit_param, wire)
                 self.theta_set.add(theta)
                 self.qiskit_params[theta] = qiskit_param
-            self.gate_list.append(sp_gate.RY(sp.Symbol(theta, real=True), wire))
+            self.gate_record.append(sp_gate.RY(sp.Symbol(theta, real=True), wire))
         else:
             self.qiskit_circuit.ry(theta, wire)
-            self.gate_list.append(sp_gate.RY(theta, wire))
+            self.gate_record.append(sp_gate.RY(theta, wire))
     def rz(self, theta, wire):
         self._check_wire(wire)
         if type(theta) == str:
@@ -121,10 +140,10 @@ class Circuit:
                 self.qiskit_circuit.rz(qiskit_param, wire)
                 self.theta_set.add(theta)
                 self.qiskit_params[theta] = qiskit_param
-            self.gate_list.append(sp_gate.RZ(sp.Symbol(theta, real=True), wire))
+            self.gate_record.append(sp_gate.RZ(sp.Symbol(theta, real=True), wire))
         else:
             self.qiskit_circuit.rz(theta, wire)
-            self.gate_list.append(sp_gate.RZ(theta, wire))
+            self.gate_record.append(sp_gate.RZ(theta, wire))
     def rxx(self, theta, wire1, wire2):
         self._check_wire(wire1)
         self._check_wire(wire2)
@@ -136,10 +155,10 @@ class Circuit:
                 self.qiskit_circuit.rxx(qiskit_param, wire1, wire2)
                 self.theta_set.add(theta)
                 self.qiskit_params[theta] = qiskit_param
-            self.gate_list.append(sp_gate.RXX(sp.Symbol(theta, real=True), wire1, wire2))
+            self.gate_record.append(sp_gate.RXX(sp.Symbol(theta, real=True), wire1, wire2))
         else:
             self.qiskit_circuit.rxx(theta, wire1, wire2)
-            self.gate_list.append(sp_gate.RXX(theta, wire1, wire2))
+            self.gate_record.append(sp_gate.RXX(theta, wire1, wire2))
     def ryy(self, theta, wire1, wire2):
         self._check_wire(wire1)
         self._check_wire(wire2)
@@ -151,10 +170,10 @@ class Circuit:
                 self.qiskit_circuit.ryy(qiskit_param, wire1, wire2)
                 self.theta_set.add(theta)
                 self.qiskit_params[theta] = qiskit_param
-            self.gate_list.append(sp_gate.RYY(sp.Symbol(theta, real=True), wire1, wire2))
+            self.gate_record.append(sp_gate.RYY(sp.Symbol(theta, real=True), wire1, wire2))
         else:
             self.qiskit_circuit.ryy(theta, wire1, wire2)
-            self.gate_list.append(sp_gate.RYY(theta, wire1, wire2))
+            self.gate_record.append(sp_gate.RYY(theta, wire1, wire2))
     def rzz(self, theta, wire1, wire2):
         self._check_wire(wire1)
         self._check_wire(wire2)
@@ -166,22 +185,22 @@ class Circuit:
                 self.qiskit_circuit.rzz(qiskit_param, wire1, wire2)
                 self.theta_set.add(theta)
                 self.qiskit_params[theta] = qiskit_param
-            self.gate_list.append(sp_gate.RZZ(sp.Symbol(theta, real=True), wire1, wire2))
+            self.gate_record.append(sp_gate.RZZ(sp.Symbol(theta, real=True), wire1, wire2))
         else:
             self.qiskit_circuit.rzz(theta, wire1, wire2)
-            self.gate_list.append(sp_gate.RZZ(theta, wire1, wire2))
+            self.gate_record.append(sp_gate.RZZ(theta, wire1, wire2))
     def swap(self, wire1, wire2):
         self._check_wire(wire1)
         self._check_wire(wire2)
         self.qiskit_circuit.swap(wire1, wire2)
-        self.gate_list.append(sp_gate.SWAP(wire1, wire2))
+        self.gate_record.append(sp_gate.SWAP(wire1, wire2))
     def cx(self, wire1, wire2):
         self._check_wire(wire1)
         self._check_wire(wire2)
         self.qiskit_circuit.cx(wire1, wire2)
-        self.gate_list.append(sp_gate.CX(wire1, wire2))
+        self.gate_record.append(sp_gate.CX(wire1, wire2))
     def cz(self, wire1, wire2):
         self._check_wire(wire1)
         self._check_wire(wire2)
         self.qiskit_circuit.cz(wire1, wire2)
-        self.gate_list.append(sp_gate.CZ(wire1, wire2))
+        self.gate_record.append(sp_gate.CZ(wire1, wire2))

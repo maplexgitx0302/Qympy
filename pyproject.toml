@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "qympy"
+version = "1.2.0"
+description = "Symbolic Calculation of Quantum Computation with Sympy"
+readme = "README.md"
+authors = [{ name = "Yi-An Chen", email = "r08222011@gmail.com" }]
+keywords = ["Sympy", "Qiskit", "Quantum"]
+license = {file = "LICENSE"}
+classifiers = [
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+]
+dependencies = [
+    "sympy",
+    "qiskit",
+]
+
+[project.urls]
+Homepage = "https://github.com/r08222011/Qympy"
