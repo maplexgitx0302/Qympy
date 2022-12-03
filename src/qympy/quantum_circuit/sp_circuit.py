@@ -102,93 +102,6 @@ class Circuit:
         self._check_wire(wire)
         self.qiskit_circuit.z(wire)
         self.gate_record.append(sp_gate.Z(wire))
-    def rx(self, theta, wire):
-        self._check_wire(wire)
-        if type(theta) == str:
-            if theta in self.theta_set:
-                self.qiskit_circuit.rx(self.qiskit_params[theta], wire)
-            else:
-                qiskit_param = qiskit.circuit.Parameter(theta)
-                self.qiskit_circuit.rx(qiskit_param, wire)
-                self.theta_set.add(theta)
-                self.qiskit_params[theta] = qiskit_param
-            self.gate_record.append(sp_gate.RX(sp.Symbol(theta, real=True), wire))
-        else:
-            self.qiskit_circuit.rx(theta, wire)
-            self.gate_record.append(sp_gate.RX(theta, wire))
-    def ry(self, theta, wire):
-        self._check_wire(wire)
-        if type(theta) == str:
-            if theta in self.theta_set:
-                self.qiskit_circuit.ry(self.qiskit_params[theta], wire)
-            else:
-                qiskit_param = qiskit.circuit.Parameter(theta)
-                self.qiskit_circuit.ry(qiskit_param, wire)
-                self.theta_set.add(theta)
-                self.qiskit_params[theta] = qiskit_param
-            self.gate_record.append(sp_gate.RY(sp.Symbol(theta, real=True), wire))
-        else:
-            self.qiskit_circuit.ry(theta, wire)
-            self.gate_record.append(sp_gate.RY(theta, wire))
-    def rz(self, theta, wire):
-        self._check_wire(wire)
-        if type(theta) == str:
-            if theta in self.theta_set:
-                self.qiskit_circuit.rz(self.qiskit_params[theta], wire)
-            else:
-                qiskit_param = qiskit.circuit.Parameter(theta)
-                self.qiskit_circuit.rz(qiskit_param, wire)
-                self.theta_set.add(theta)
-                self.qiskit_params[theta] = qiskit_param
-            self.gate_record.append(sp_gate.RZ(sp.Symbol(theta, real=True), wire))
-        else:
-            self.qiskit_circuit.rz(theta, wire)
-            self.gate_record.append(sp_gate.RZ(theta, wire))
-    def rxx(self, theta, wire1, wire2):
-        self._check_wire(wire1)
-        self._check_wire(wire2)
-        if type(theta) == str:
-            if theta in self.theta_set:
-                self.qiskit_circuit.rxx(self.qiskit_params[theta], wire1, wire2)
-            else:
-                qiskit_param = qiskit.circuit.Parameter(theta)
-                self.qiskit_circuit.rxx(qiskit_param, wire1, wire2)
-                self.theta_set.add(theta)
-                self.qiskit_params[theta] = qiskit_param
-            self.gate_record.append(sp_gate.RXX(sp.Symbol(theta, real=True), wire1, wire2))
-        else:
-            self.qiskit_circuit.rxx(theta, wire1, wire2)
-            self.gate_record.append(sp_gate.RXX(theta, wire1, wire2))
-    def ryy(self, theta, wire1, wire2):
-        self._check_wire(wire1)
-        self._check_wire(wire2)
-        if type(theta) == str:
-            if theta in self.theta_set:
-                self.qiskit_circuit.ryy(self.qiskit_params[theta], wire1, wire2)
-            else:
-                qiskit_param = qiskit.circuit.Parameter(theta)
-                self.qiskit_circuit.ryy(qiskit_param, wire1, wire2)
-                self.theta_set.add(theta)
-                self.qiskit_params[theta] = qiskit_param
-            self.gate_record.append(sp_gate.RYY(sp.Symbol(theta, real=True), wire1, wire2))
-        else:
-            self.qiskit_circuit.ryy(theta, wire1, wire2)
-            self.gate_record.append(sp_gate.RYY(theta, wire1, wire2))
-    def rzz(self, theta, wire1, wire2):
-        self._check_wire(wire1)
-        self._check_wire(wire2)
-        if type(theta) == str:
-            if theta in self.theta_set:
-                self.qiskit_circuit.rzz(self.qiskit_params[theta], wire1, wire2)
-            else:
-                qiskit_param = qiskit.circuit.Parameter(theta)
-                self.qiskit_circuit.rzz(qiskit_param, wire1, wire2)
-                self.theta_set.add(theta)
-                self.qiskit_params[theta] = qiskit_param
-            self.gate_record.append(sp_gate.RZZ(sp.Symbol(theta, real=True), wire1, wire2))
-        else:
-            self.qiskit_circuit.rzz(theta, wire1, wire2)
-            self.gate_record.append(sp_gate.RZZ(theta, wire1, wire2))
     def swap(self, wire1, wire2):
         self._check_wire(wire1)
         self._check_wire(wire2)
@@ -204,3 +117,42 @@ class Circuit:
         self._check_wire(wire2)
         self.qiskit_circuit.cz(wire1, wire2)
         self.gate_record.append(sp_gate.CZ(wire1, wire2))
+    def _add_param_gate(self, gate_name, theta, wires):
+        gate_qiskit = getattr(self.qiskit_circuit, gate_name)
+        gate_spgate = getattr(sp_gate, gate_name.upper())
+        if type(theta) == str:
+            if theta in self.theta_set:
+                gate_qiskit(self.qiskit_params[theta], *wires)
+            else:
+                qiskit_param = qiskit.circuit.Parameter(theta)
+                gate_qiskit(qiskit_param, *wires)
+                self.theta_set.add(theta)
+                self.qiskit_params[theta] = qiskit_param
+            self.gate_record.append(gate_spgate(sp.Symbol(theta, real=True), *wires))
+        elif type(theta) in [int, float, complex]:
+            gate_qiskit(theta, *wires)
+            self.gate_record.append(gate_spgate(theta, *wires))
+        else: # it would expected to be type from Sympy expressions
+            gate_qiskit(0, *wires)
+            self.gate_record.append(gate_spgate(theta, *wires))
+    def rx(self, theta, wire):
+        self._check_wire(wire)
+        self._add_param_gate("rx", theta, wires=[wire])
+    def ry(self, theta, wire):
+        self._check_wire(wire)
+        self._add_param_gate("ry", theta, wires=[wire])
+    def rz(self, theta, wire):
+        self._check_wire(wire)
+        self._add_param_gate("rz", theta, wires=[wire])
+    def rxx(self, theta, wire1, wire2):
+        self._check_wire(wire1)
+        self._check_wire(wire2)
+        self._add_param_gate("rxx", theta, wires=[wire1, wire2])
+    def ryy(self, theta, wire1, wire2):
+        self._check_wire(wire1)
+        self._check_wire(wire2)
+        self._add_param_gate("ryy", theta, wires=[wire1, wire2])
+    def rzz(self, theta, wire1, wire2):
+        self._check_wire(wire1)
+        self._check_wire(wire2)
+        self._add_param_gate("rzz", theta, wires=[wire1, wire2])

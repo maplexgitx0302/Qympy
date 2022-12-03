@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "qympy"
-version = "1.2.1"
+version = "1.3.0"
 description = "Symbolic Calculation of Quantum Computation with Sympy"
 readme = "README.md"
 authors = [{ name = "Yi-An Chen", email = "r08222011@gmail.com" }]
