@@ -156,8 +156,8 @@ class SWAP(TwoQubitGate):
 class CX(TwoQubitGate):
     def __init__(self, wire1, wire2):
         super().__init__()
-        self.wire1 = wire1
-        self.wire2 = wire2
+        self.wire1 = wire1 # control qubit
+        self.wire2 = wire2 # target qubit
         self.matrix = sp.Matrix([
             [1,0,0,0],
             [0,1,0,0],
@@ -168,11 +168,50 @@ class CX(TwoQubitGate):
 class CZ(TwoQubitGate):
     def __init__(self, wire1, wire2):
         super().__init__()
-        self.wire1 = wire1
-        self.wire2 = wire2
+        self.wire1 = wire1 # control qubit
+        self.wire2 = wire2 # target qubit
         self.matrix = sp.Matrix([
             [1,0,0,0],
             [0,1,0,0],
             [0,0,1,0],
             [0,0,0,-1],
+        ])
+
+class CRX(TwoQubitGate):
+    def __init__(self, theta, wire1, wire2):
+        super().__init__()
+        self.wire1 = wire1 # control qubit
+        self.wire2 = wire2 # target qubit
+        half = sp.Rational(1, 2)
+        self.matrix = sp.Matrix([
+            [1,0,0,0],
+            [0,1,0,0],
+            [0,0,sp.cos(half*theta), -sp.I*sp.sin(half*theta)],
+            [0,0,-sp.I*sp.sin(half*theta), sp.cos(half*theta)],
+        ])
+
+class CRY(TwoQubitGate):
+    def __init__(self, theta, wire1, wire2):
+        super().__init__()
+        self.wire1 = wire1 # control qubit
+        self.wire2 = wire2 # target qubit
+        half = sp.Rational(1, 2)
+        self.matrix = sp.Matrix([
+            [1,0,0,0],
+            [0,1,0,0],
+            [0,0,sp.cos(half*theta), -sp.sin(half*theta)],
+            [0,0,sp.sin(half*theta), sp.cos(half*theta)],
+        ])
+
+class CRZ(TwoQubitGate):
+    def __init__(self, theta, wire1, wire2):
+        super().__init__()
+        self.wire1 = wire1 # control qubit
+        self.wire2 = wire2 # target qubit
+        half = sp.Rational(1, 2)
+        self.matrix = sp.Matrix([
+            [1,0,0,0],
+            [0,1,0,0],
+            [0,0,sp.exp(-sp.I*half*theta), 0],
+            [0,0,0, sp.exp(sp.I*half*theta)],
         ])

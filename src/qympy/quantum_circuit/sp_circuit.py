@@ -108,11 +108,15 @@ class Circuit:
         self.qiskit_circuit.swap(wire1, wire2)
         self.gate_record.append(sp_gate.SWAP(wire1, wire2))
     def cx(self, wire1, wire2):
+        # wire 1 is control qubit
+        # wire 2 is target qubit
         self._check_wire(wire1)
         self._check_wire(wire2)
         self.qiskit_circuit.cx(wire1, wire2)
         self.gate_record.append(sp_gate.CX(wire1, wire2))
     def cz(self, wire1, wire2):
+        # wire 1 is control qubit
+        # wire 2 is target qubit
         self._check_wire(wire1)
         self._check_wire(wire2)
         self.qiskit_circuit.cz(wire1, wire2)
@@ -156,3 +160,15 @@ class Circuit:
         self._check_wire(wire1)
         self._check_wire(wire2)
         self._add_param_gate("rzz", theta, wires=[wire1, wire2])
+    def crx(self, theta, wire1, wire2):
+        self._check_wire(wire1)
+        self._check_wire(wire2)
+        self._add_param_gate("crx", theta, wires=[wire1, wire2])
+    def cry(self, theta, wire1, wire2):
+        self._check_wire(wire1)
+        self._check_wire(wire2)
+        self._add_param_gate("cry", theta, wires=[wire1, wire2])
+    def crz(self, theta, wire1, wire2):
+        self._check_wire(wire1)
+        self._check_wire(wire2)
+        self._add_param_gate("crz", theta, wires=[wire1, wire2])
