@@ -1,3 +1,5 @@
+![plot](./Logo/Qympy_Long_Logo.png)
+
 # Qympy - Quantum Analytic Computation with Sympy
 A sympy based python package for symbolic calculation of quantum circuit and machine learning.
 See GitHub: https://github.com/r08222011/Qympy
